@@ -100,7 +100,7 @@ sixrd_configs_remove() {
 }
 
 sixrd_setup_add() {
-	logger -p daemon.info -t dhclient "Starting 6RD tunnel on $interface."
+    logger -p daemon.info -t dhclient "Starting 6RD tunnel on $interface."
     # Setup the tunnel interface
     ip tunnel add $SIXRDTUNIF mode sit local $WAN4IP ttl $SIXRDTUNTTL
     # This is the magic virtually undocumented 6rd sauce
@@ -120,7 +120,7 @@ sixrd_setup_add() {
 }
 
 sixrd_setup_remove() {
-	logger -p daemon.info -t dhclient "Stopping 6RD tunnel on $interface."
+    logger -p daemon.info -t dhclient "Stopping 6RD tunnel on $interface."
     # Remove the tunnel interface and related addresses
     ip -6 addr del $LOCAL6LANIP/$LOCAL6PREFIXLEN dev $LANIF
     ip tunnel del $SIXRDTUNIF
@@ -128,29 +128,29 @@ sixrd_setup_remove() {
 
 sixrd_setup() {
     if [ $interface != $WANIF ]; then
-		logger -p daemon.info -t dhclient "Skipping 6RD setup for $interface."
+        logger -p daemon.info -t dhclient "Skipping 6RD setup for $interface."
         return
     fi
-	case $reason in
-		BOUND|REBOOT)
-			sixrd_setup_add
+    case $reason in
+        BOUND|REBOOT)
+            sixrd_setup_add
             sixrd_configs_add
-			;;
-		RENEW|REBIND)
+            ;;
+        RENEW|REBIND)
             if [ "$new_ip_address" != "$old_ip_address" ]; then
-			    sixrd_setup_remove
+                sixrd_setup_remove
                 sixrd_setup_add
                 sixrd_configs_add
             fi
             ;;
-		EXPIRE|FAIL|RELEASE)
+        EXPIRE|FAIL|RELEASE)
             sixrd_configs_remove
-			sixrd_setup_remove
-			;;
-		STOP)
-			sixrd_setup_remove
+            sixrd_setup_remove
             ;;
-	esac
+        STOP)
+            sixrd_setup_remove
+            ;;
+    esac
 }
 
 sixrd_setup
