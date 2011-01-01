@@ -1,0 +1,85 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          firewall
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Stupidly Simple Firewall
+### END INIT INFO
+
+# Author: Michael Marineau <mike@marineau.org>
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="Firewall"
+
+ipXtables()
+{
+    iptables "$@" || return 1
+    ip6tables "$@" || return 1
+}
+
+do_start()
+{
+    # Note: br1 and eth1 are interfaces to the local LAN
+
+    do_stop || return 2
+
+    # INPUT
+    ipXtables -A INPUT -i lo -j ACCEPT || return 2
+    ipXtables -A INPUT -i br1 -j ACCEPT || return 2
+    ipXtables -A INPUT -i eth1 -j ACCEPT || return 2
+    ipXtables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT || return 2
+    ipXtables -A INPUT -p tcp --dport 22 -j ACCEPT || return 2
+    ipXtables -A INPUT -p tcp --dport 25 -j ACCEPT || return 2
+    iptables  -A INPUT -p icmp -j ACCEPT || return 2
+    ip6tables -A INPUT -p icmpv6 -j ACCEPT || return 2
+    ipXtables -A INPUT -j DROP || return 2
+
+    # FORWARD
+    ipXtables -A FORWARD -i br1 -j ACCEPT || return 2
+    ipXtables -A FORWARD -i eth1 -j ACCEPT || return 2
+    ipXtables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT || return 2
+    ipXtables -A FORWARD -j DROP || return 2
+
+    # NAT for IPv4 LAN
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE || return 2
+}
+
+do_stop()
+{
+    ipXtables -F INPUT || return 2
+    ipXtables -F FORWARD || return 2
+    iptables -t nat -F POSTROUTING || return 2
+}
+
+case "$1" in
+  start)
+    echo -n "Loading Firewall Rules... "
+	do_start
+	case "$?" in
+		0) echo "OK" ;;
+		*) echo "FAIL" ;;
+	esac
+	;;
+  stop)
+    echo -n "Flushing Firewall Rules... "
+	do_stop
+	case "$?" in
+		0) echo "OK" ;;
+		*) echo "FAIL" ;;
+	esac
+	;;
+  restart|force-reload|reload)
+    echo -n "Loading Firewall Rules... "
+	do_start
+	case "$?" in
+		0) echo "OK" ;;
+		*) echo "FAIL" ;;
+	esac
+	;;
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+	exit 3
+	;;
+esac
