@@ -1,8 +1,0 @@
-This is a collection of stuff I use for setting up IPv6 tunnels via
-Comcast's 6RD system. It seems to work for me so far. :-)
-
-The main script of interest is dhclient-exit-hooks.d/comcast-6rd-tunnel
-which runs each time dhclient gets an IPv4 address and then sets up the
-tunnel as needed (or tears it down if you ifdown eth0). Chances are you
-will need to customize it for your own use as it touches some things
-beyond just the tunnel like DNS goodies.
