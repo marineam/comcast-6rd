@@ -55,9 +55,10 @@ Setup
       net.ipv4.ip_forward=1
       net.ipv6.conf.all.forwarding=1
 
-4. Now it is go time! Install the scripts and bounce the interface::
+4. Now it is go time! Install the scripts, bounce the interface, etc.::
 
       make install
+      sysctl -p
       update-rc.d firewall defaults
       /etc/init.d/firewall start
       ifdown eth0; ifup eth0
