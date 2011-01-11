@@ -30,6 +30,9 @@ Currently any info it finds is logged via syslog.
 To keep my private home network private I use a simple firewall script
 provided in init.d/firewall which sets up rules for both v4 and v6.
 
+.. _David Ames: http://www.linux.com/learn/tutorials/371742:ipv6-6rd-linux-router-on-comcast-using-ubuntu-maverick-1010
+.. _Nathan Lutchansky: http://www.litech.org/6rd/
+
 
 Setup
 -----
