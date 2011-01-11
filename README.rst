@@ -37,6 +37,17 @@ provided in init.d/firewall which sets up rules for both v4 and v6.
 Setup
 -----
 
+0. For Ubuntu Lucid only: You will need a newer kernel and iproute2,
+   both of which are in Maverick. A backported kernel is already
+   available in Ubuntu's lucid-updates repository and a backported
+   iproute2 package is available in a ppa::
+
+      apt-get install linux-image-server-lts-backport-maverick
+      apt-add-repository ppa:nathan-launchpad/iproute-lucid-ppa
+      apt-get update
+      apt-get install iproute
+      reboot
+
 1. Be sure to edit the tunnel and firewall scripts to refer to the
    correct network interfaces for your system and any other tweaks you
    need. In my setup eth0 is the external interface and br1 (bridged to
