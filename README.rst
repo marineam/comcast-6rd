@@ -14,11 +14,10 @@ Overview
 The main script of interest is dhclient-exit-hooks.d/comcast-6rd-tunnel
 which runs each time dhclient gets an IPv4 address and then sets up the
 tunnel as needed (or tears it down if you ifdown eth0). When setting up
-the tunnel it will configure and start radvd and optionally chatter with
-bind and/or dhis.org. I use bind as a local caching name server and
-dhis.org for public dynamic DNS for both v4 and v6. If you don't run
-your own name server you will want to change the RDNS entry the script
-writes to radvd.conf to point elsewhere.
+the tunnel it will configure and start radvd and run any optional
+scripts in comcast-6rd-start.d (or stop.d when removing the tunnel).
+For example you can use this to submit your addresses to a dynamic DNS
+service such as dhis.org (one of the few that does IPv6).
 
 There is also dhclient-exit-hooks.d/comcast-6rd-params which can be used
 to watch for info via the 6RD DHCP option. Currently this doesn't work
