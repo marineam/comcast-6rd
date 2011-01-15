@@ -69,7 +69,6 @@ interface $LANIF {
     };
 };
 EOF
-    echo "$conf" > $RADVDCONF
     /etc/init.d/radvd reload || /etc/init.d/radvd start
 }
 
@@ -104,6 +103,10 @@ sixrd_setup_remove() {
     ip tunnel del $SIXRDTUNIF
 }
 
+sixrd_run() {
+    run-parts --regex '.*' --report -- "$1"
+}
+
 sixrd_setup() {
     if [ $interface != $WANIF ]; then
         logger -p daemon.info -t dhclient "Skipping 6RD setup for $interface."
@@ -113,18 +116,18 @@ sixrd_setup() {
         BOUND|REBOOT)
             sixrd_setup_add
             sixrd_setup_radvd
-            run-parts --report -- "$STARTDIR"
+            sixrd_run "$STARTDIR"
             ;;
         RENEW|REBIND)
             if [ "$new_ip_address" != "$old_ip_address" ]; then
                 sixrd_setup_remove
                 sixrd_setup_add
                 sixrd_setup_radvd
-                run-parts --report -- "$STARTDIR"
+                sixrd_run "$STARTDIR"
             fi
             ;;
         EXPIRE|FAIL|RELEASE)
-            run-parts --report -- "$STOPDIR"
+            sixrd_run "$STOPDIR"
             sixrd_stop_radvd
             sixrd_setup_remove
             ;;
