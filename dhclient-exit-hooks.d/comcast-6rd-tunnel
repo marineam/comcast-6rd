@@ -25,6 +25,12 @@
 # interface=eth0
 # new_ip_address=192.0.2.1
 
+servers="${new_domain_name_servers:-${old_domain_name_servers}}"
+digargs=""
+if [ -n "$servers" ]; then
+    digargs="@${servers/ / @}"
+fi
+
 export WANIF=eth0
 export LANIF=br1
 export SIXRDTUNIF=6rd
@@ -33,7 +39,7 @@ export SIXRDTUNTTL=64
 export WAN4IP=${new_ip_address:-$old_ip_address}
 export ISP6RDPREFIX='2001:55c'
 export ISP6RDPREFIXLEN=32
-export ISP6RDBR=$(dig +short 6rd.comcast.net)
+export ISP6RDBR=$(dig +short 6rd.comcast.net $digargs)
 export WAN4MASKLEN=0
 export LOCAL6PREFIX=$(printf "$ISP6RDPREFIX:%02x%02x:%02x%02x" ${WAN4IP//./ })
 export LOCAL6PREFIXLEN=64
