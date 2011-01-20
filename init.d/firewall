@@ -21,27 +21,25 @@ ipXtables()
 
 do_start()
 {
-    # Note: br1 and eth1 are interfaces to the local LAN
-
     do_stop || return 2
 
     # INPUT
     ipXtables -A INPUT -i lo -j ACCEPT || return 2
     ipXtables -A INPUT -i br1 -j ACCEPT || return 2
-    ipXtables -A INPUT -i eth1 -j ACCEPT || return 2
-    ipXtables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT || return 2
+    ipXtables -A INPUT -m state \
+        --state RELATED,ESTABLISHED -j ACCEPT || return 2
     ipXtables -A INPUT -p tcp --dport 22 -j ACCEPT || return 2
     ipXtables -A INPUT -p tcp --dport 25 -j ACCEPT || return 2
     iptables  -A INPUT -p icmp -j ACCEPT || return 2
     iptables  -A INPUT -p ipv6 -j ACCEPT || return 2
     ip6tables -A INPUT -p icmpv6 -j ACCEPT || return 2
-    ipXtables -A INPUT -j DROP || return 2
+    ipXtables -A INPUT -j REJECT || return 2
 
     # FORWARD
     ipXtables -A FORWARD -i br1 -j ACCEPT || return 2
-    ipXtables -A FORWARD -i eth1 -j ACCEPT || return 2
-    ipXtables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT || return 2
-    ipXtables -A FORWARD -j DROP || return 2
+    ipXtables -A FORWARD -m state \
+        --state RELATED,ESTABLISHED -j ACCEPT || return 2
+    ipXtables -A FORWARD -j REJECT || return 2
 
     # NAT for IPv4 LAN
     iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE || return 2
