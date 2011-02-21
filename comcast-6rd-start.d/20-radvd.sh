@@ -23,7 +23,7 @@ interface $LANIF {
     };
 
     RDNSS $LOCAL6DNS {
-        AdvRDNSSLifetime 120;
+        AdvRDNSSLifetime 3600;
     };
 };
 EOF
